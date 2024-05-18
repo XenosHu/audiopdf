@@ -7,11 +7,11 @@ import os
 def convert_pdf_to_audio(pdf_file, voice_gender):
     # Read the PDF file
     with pdf_file as book:
-        pdf_reader = PyPDF2.PdfFileReader(book)
+        pdf_reader = PyPDF2.PdfReader(book)
         text = ""
-        for page_num in range(pdf_reader.numPages):
-            page = pdf_reader.getPage(page_num)
-            text += page.extractText()
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            text += page.extract_text()
 
     # Initialize the text-to-speech engine
     engine = pyttsx3.init()
@@ -28,6 +28,7 @@ def convert_pdf_to_audio(pdf_file, voice_gender):
         engine.save_to_file(text, output)
         output.seek(0)
         return output.read()
+
         
 def main():
     st.title("PDF to Audio Converter")
