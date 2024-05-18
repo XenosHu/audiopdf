@@ -3,7 +3,7 @@ import PyPDF2
 import io
 import os
 from streamlit_TTS import auto_play, text_to_speech, text_to_audio
-
+from openai import OpenAI
 from gtts.lang import tts_langs
 
 langs = list(tts_langs().keys())
