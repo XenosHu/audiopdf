@@ -3,50 +3,34 @@ import pyttsx3
 import PyPDF2
 import io
 import os
+from streamlit_TTS import auto_play, text_to_speech, text_to_audio
 
-def convert_pdf_to_audio(pdf_file, voice_gender):
-    # Read the PDF file
-    with pdf_file as book:
-        pdf_reader = PyPDF2.PdfReader(book)
-        text = ""
-        for page_num in range(len(pdf_reader.pages)):
-            page = pdf_reader.pages[page_num]
-            text += page.extract_text()
+from gtts.lang import tts_langs
 
-    # Initialize the text-to-speech engine
-    engine = pyttsx3.init()
+langs = list(tts_langs().keys())
 
-    # Set the voice based on the selected gender
-    voices = engine.getProperty('voices')
-    if voice_gender == 'Male':
-        engine.setProperty('voice', voices[0].id)  # Assuming male voice is the first one
-    else:
-        engine.setProperty('voice', voices[1].id)  # Assuming female voice is the second one
+# Function to play audio directly
+def play_audio(audio):
+    auto_play(audio)
 
-    # Convert text to speech
-    with io.BytesIO() as output:
-        engine.save_to_file(text, output)
-        output.seek(0)
-        return output.read()
+# Function to convert text to speech and play the audio
+def convert_and_play(text, language='en', voice='male'):
+    audio = text_to_audio(text, language=language)
+    play_audio(audio)
 
-        
+# Main Streamlit app
 def main():
-    st.title("PDF to Audio Converter")
+    st.title("Text-to-Speech Converter")
 
-    # Upload PDF file
-    pdf_file = st.file_uploader("Upload PDF file", type=['pdf'])
+    selected_lang = st.selectbox("Choose a language", options=langs)
+    selected_voice = st.selectbox("Choose a voice", ['male', 'female'])
+    text_input = st.text_input("Enter text to convert to speech")
 
-    # Select voice gender
-    voice_gender = st.selectbox("Select voice gender", ['Male', 'Female'])
-
-    # Convert PDF to audio on button click
-    if st.button("Convert to Audio"):
-        if pdf_file is not None:
-            audio_file = convert_pdf_to_audio(pdf_file, voice_gender)
-            st.audio(audio_file, format='audio/mp3', start_time=0)
-
-            # Provide download link
-            st.markdown(f"Download the audio file [here](./{audio_file})")
+    if st.button("Speak"):
+        if text_input:
+            convert_and_play(text_input, language=selected_lang, voice=selected_voice)
+        else:
+            st.error("Please enter some text.")
 
 if __name__ == "__main__":
     main()
