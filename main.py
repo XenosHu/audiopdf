@@ -1,19 +1,15 @@
 import streamlit as st
 import pyttsx3
 import PyPDF2
+import io
+import os
 
 def convert_pdf_to_audio(pdf_file, voice_gender):
-    # Open the PDF file in binary mode
-    with open(pdf_file, 'rb') as book:
-        # Create a PDF reader object
+    # Read the PDF file
+    with pdf_file as book:
         pdf_reader = PyPDF2.PdfFileReader(book)
-
-        # Initialize text to store extracted content
         text = ""
-
-        # Iterate through all the pages
         for page_num in range(pdf_reader.numPages):
-            # Extract text from the page
             page = pdf_reader.getPage(page_num)
             text += page.extractText()
 
@@ -28,11 +24,11 @@ def convert_pdf_to_audio(pdf_file, voice_gender):
         engine.setProperty('voice', voices[1].id)  # Assuming female voice is the second one
 
     # Convert text to speech
-    engine.save_to_file(text, 'output.mp3')
-    engine.runAndWait()
-
-    return 'output.mp3'
-
+    with io.BytesIO() as output:
+        engine.save_to_file(text, output)
+        output.seek(0)
+        return output.read()
+        
 def main():
     st.title("PDF to Audio Converter")
 
