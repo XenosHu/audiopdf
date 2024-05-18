@@ -2,3 +2,4 @@ streamlit
 PyPDF2
 streamlit_TTS
 python-dotenv
+openai
